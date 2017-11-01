@@ -721,23 +721,26 @@ ul :hover {
 	}
 	
 	#pay_button {
-		font-size: 100%;
+		font-size: 80%;
 		border-radius: 8px;
 		margin-right: 20px;
 		width: 40%;
+		text-align: center;
 		height: 40px;
 	}
 
 	#reqpayment_button {
-		font-size: 100%;
+		font-size: 80%;
 		width: 60%;
 		height: 40px;
 		cursor: pointer;
+		text-align: center;
 		margin-right: 0px;
 	}
 	
 	#all_bank {
-		font-size: 9px;
+		text-align: center;
+		font-size: 8px;
 		border-radius: 8px;
 		background: #E2CEE5;
 		color: black;
@@ -747,7 +750,8 @@ ul :hover {
 	}
 
 	#any_bank {
-		font-size: 9px;
+		text-align: center;
+		font-size: 8px;
 		margin-right: 0px;
 		width: 60%;
 		height: 30px;
