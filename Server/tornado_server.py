@@ -20,7 +20,7 @@ FORM = ''
 COUNT = 0
 SYMBOLS = {b'\xd0\x9d': b'\x1d\x04', b'\xd0\x94': b'\x14\x04', b'\xd0\xa1': b'\x21\x04',
            b'\xd0\x91': b'\x11\x04', b'\xd0\xb5': b'\x35\x04', b'\xd0\xb7': b'\x37\x04'}
-HOST = 'http://localhost:8000/'
+HOST = 'http://webtask1.ddns.net/'
 LOCKC = threading.Lock()
 ASSOCTIATION_MIME = {'css': 'text/css', 'js': 'text/javascript'}
 CHECKLIST = {
