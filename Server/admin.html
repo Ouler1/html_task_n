@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="js">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+		<title>Admin Panel</title>
+		<link rel="stylesheet" href="static/styles_admin.css">
+		<script src="static/vue.js"></script>
+		<script src="static/vue-resource.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<div id="options">
+				<button id="exit" v-on:click="exit_command">Выйти</button>
+				<div id="button_table">
+					<button id="pay" v-on:click="req_table">Платежи</button>
+					<button id="reqpayment" v-on:click="req_table">Запрошенные платежи</button>
+					<div id="info_table">Таблица: {{ table.text }} </div>
+				</div>
+				<div id="fields_1">
+					<div id="info_field_1">Выбор поля</div>
+					<button v-for="field in fields.slice(1)" v-on:click="choice($event, 1)">{{ field.alias }}</button>
+				</div>
+				<div id="inputer_name_1"> Выбранное поле: {{ alias_1.text }} </div>
+				<div id="sort">
+					<button id="asc" v-on:click="sortC($event)">По возрастанию</button>
+					<button id="desc" v-on:click="sortC($event)">По убыванию</button>
+					<div id="info_sort">Сортировка: {{ sort_value.text }}</div>
+				</div>
+				<div id="fields_2">
+					<div id="info_field_2">Выбор поля</div>
+					<button v-for="field in fields.slice(1)" v-on:click="choice($event, 2)">{{ field.alias }}</button>
+				</div>
+				<div id="inputer">
+					<div id="inputer_name_2"> Выбранное поле: {{ alias_2.text }} </div>
+					<input id="inputer_input" v-on:keyup="req_rem" placeholder="Поиск по регвыру">
+				</div>
+				<button id="request" v-on:click="request">Поиск по заданным критериям</button>
+			</div>
+			<div>
+				<table>
+					<thead>
+						<tr>
+							<th v-for="field in fields"> {{ field.alias }} </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-on:click="toggle" v-for="record in records">
+							<template>
+								<cell v-for="value in record" :value="value"></cell>
+							</template>
+						</tr>
+					</tbody>
+				</table>
+				<template id="conn-cell">
+					<td>{{ value }}</td>
+				</template>
+			</div>
+		</div>
+		<script src="static/script_admin.js"></script>
+	</body>
+</html>

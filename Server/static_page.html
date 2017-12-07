@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" class="js">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+		<title>Title Name</title>
+		<link rel="stylesheet" href="static/styles_old.css">
+		<link rel="stylesheet" href="static/stylesA.css">
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script src="static/jquery.maskedinput.js"></script>
+		<script src="static/masks.js"></script>
+		<script src="static/H5F.js"></script>
+		<script src="static/vue.js"></script>
+		<script src="static/imask.js"></script>
+		<script src="static/vue-resource.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<div class="content">
+				<div class="information_person">
+					<div class="text_info">
+						<div id="name_person">{{ name }}</div>
+						<div id="telephone"><p>Телефон: <span> {{ phone }} </span></p></div>
+						<div id="name_site"><p>Сайт: <a href="#"> {{ site }} </a></p></div>
+						<div id="email"><p>E-mail: <a href="#"> {{ email }} </a></p></div>
+						<div id="about_person"><a href="#">Информация о компании</a></div>
+						<div id="details"><a href="#">Информация о реквизитах</a></div>
+					</div>
+					<div id="avatar"><img src="static/images/photo-2.png" alt="No picture"/></div>
+				</div>
+				<div class="action_form">
+					<div class="choice_action">
+						<button class="light" id="pay_button" v-on:click="toggle_form([], ['reqpayment_button', 'any_bank'], ['pay_button', 'all_bank'], 'pay_all', ['pay_any', 'reqpayment'])">Заплатить</button>
+						<button class="dark" id="reqpayment_button" v-on:click="toggle_form(['any_bank', 'all_bank'], ['pay_button'], ['reqpayment_button'], 'reqpayment', ['pay_all', 'pay_any'])">Запросить платёж</button>
+					</div>
+					<div class="how_pay">
+						<button class="light" id="all_bank" v-on:click="toggle_form([], ['reqpayment_button', 'any_bank'], ['pay_button', 'all_bank'], 'pay_all', ['pay_any', 'reqpayment'])">C карты любого банка</button>
+						<button class="dark" id="any_bank" v-on:click="toggle_form([], ['reqpayment_button', 'all_bank'], ['pay_button', 'any_bank'], 'pay_any', ['reqpayment', 'pay_all'])">Из своего интернет-банка</button>
+					</div>
+					<form id="pay_all" v-on:keyup="check_form">
+						<div class="card">
+							<div class="label_partner"></div>
+							<input id="num_card" name="num_card" type="text" pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}" placeholder="Номер карты"/>
+							<div class="wrapper">
+								<input id="date_act" name="date_act" type="text" pattern="((0[0-9])|(1[012]))/((1[789])|(2[0-9])|(3[012345]))" placeholder="ММ/ГГ" maxlength="5"/>
+								<input id="cvc" name="cvc" type="text" pattern="[0-9]{3}" placeholder="CVC" maxlength="3"/>
+							</div>
+						</div>
+						<div class="part_form">
+							<div class="input_block_pay_all">
+								<div class="input_info">Сумма</div>
+								<input class="input_input" id="sum_p_a" name="sum_p_a"  type="text" min="1000" max="75000" pattern='([1-9][0-9]{3})|([1-6][0-9]{4})|(7[0-5][0-9]{3})' required placeholder="от 1000 до 75000 ₽"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Комментарий</div>
+								<input class="input_input" name="comment"  type="text" placeholder="До 150 символов" maxlength="150"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Ваша эл.почта</div>
+								<input class="input_input" name="e_m_p_a" type="email" placeholder="Для квитанций об оплате"/>
+							</div>
+							<div class="button_decor"><button class="upclick" v-on:mousedown="submit_p($event, 'pay_all', 1)" v-on:mouseup="submit_p($event, 'pay_all',0)" type="button" name="pay_action_button" id="pay_action_button">Заплатить</button></div>
+						</div>
+					</form>
+					<form id="pay_any" v-on:keyup="check_form">
+						<div class="info_pay">Сформируйте платёжку и загрузите её в свой банк для подписи</div>
+						<div class="part_form_2">
+							<div class="input_block_pay_all">
+								<div class="input_info">От кого</div>
+								<input class="input_input" id="from_whom" name="from_whom" type="text" pattern="[0-9]{12}|[0-9]{10}" placeholder="ИНН или название плательщика" maxlength="12"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">БИК</div>
+								<input class="input_input" id="bik" name="bik" pattern="[0-9]{9}" type="text" maxlength="9"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Номер счёта</div>
+								<input class="input_input" id="num_bank" name="num_bank" pattern="[0-9]{20}" type="text"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">За что</div>
+								<input class="input_input" name="why_s" required type="text" disabled />
+							</div>
+							<div class="why_s_choice">
+								<div class="decor_s" id="1w" v-on:click="toggle_radio($event, 'why_s', 'НДС 18%')">НДС 18%</div>
+								<div class="decor_s" id="2w" v-on:click="toggle_radio($event, 'why_s', 'НДС 10%')">НДС 10%</div>
+								<div class="decor_s" id="3w" v-on:click="toggle_radio($event, 'why_s', 'Без НДС')">Без НДС</div>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Сколько</div>
+								<input class="input_input" id="sum_p_an" name="sum_p_an" pattern='([1-9][0-9]{3})|([1-6][0-9]{4})|(7[0-5][0-9]{3})' min="1000" max="75000" required type="text" placeholder="от 1000 до 75000 ₽"/>
+							</div>
+							<div class="button_decor"><button class="upclick" v-on:mousedown="submit_p($event, 'pay_any', 1)" v-on:mouseup="submit_p($event, 'pay_any',0)" type="button" name="get_action_button" id="get_action_button">Получить файл для интернет-банка</button></div>
+						</div>
+						<div class="light_blue" id="clear_action_button" v-on:click="clear_form('pay_any')" v-on:mousedown="click_clear($event, 0)" v-on:mouseup="click_clear($event, 1)">Очистить форму</div>
+					</form>					
+					<form id="reqpayment" v-on:keyup="check_form">
+						<div class="info_pay">Создайте платёжку, а {{ name }} подпишет её у себя в интернет-банке</div>
+						<div class="part_form_3">
+							<div class="input_block_pay_all">
+								<div class="input_info">ИНН получателя</div>
+								<input class="input_input" id="getterINN" name="getterINN" type="text" maxlength="12" pattern="[0-9]{12}|[0-9]{10}" placeholder="ИНН или название получателя"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">БИК</div>
+								<input class="input_input" id="bik_r" name="bik_r" pattern="[0-9]{9}" type="text"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Номер счёта</div>
+								<input class="input_input" id="num_bank_r" name="num_bank_r" pattern="[0-9]{20}" type="text"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">За что</div>
+								<input class="input_input" name="why_s_r" required type="text" disabled />
+							</div>
+							<div class="why_s_choice">
+								<div class="decor_s" id="1wr" v-on:click="toggle_radio($event, 'why_s_r', 'НДС 18%')">НДС 18%</div>
+								<div class="decor_s" id="2wr" v-on:click="toggle_radio($event, 'why_s_r', 'НДС 10%')">НДС 10%</div>
+								<div class="decor_s" id="3wr" v-on:click="toggle_radio($event, 'why_s_r', 'Без НДС')">Без НДС</div>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Сколько</div>
+								<input class="input_input" id="sum_p_r" pattern='([1-9][0-9]{3})|([1-6][0-9]{4})|(7[0-5][0-9]{3})' name="sum_p_r" type="text" min="1000" max="75000" required placeholder="от 1000 до 75000 ₽" maxlength="5"/>
+							</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Номер телефона</div>
+								<input class="input_input" id="num_phone" name="num_phone" pattern="\+7 [0-9]{3} [0-9]{3}-[0-9]{2}-[0-9]{2}" type="text"/>
+							</div>
+							<div class="info_telephone">Оставляя телефон, вы соглашаетесь на обработку персональных данных</div>
+							<div class="input_block_pay_all">
+								<div class="input_info">Эл.почта</div>
+								<input class="input_input" id="e_m_r" name="e_m_r" type="email" placeholder="Для уведомления об оплате"/>
+							</div>
+							<div class="button_decor"><button class="upclick" type="button" v-on:mousedown="submit_p($event, 'reqpayment', 1)" v-on:mouseup="submit_p($event, 'reqpayment', 0)" name="create_req_action_button" id="create_req_action_button">Создать платёж</button></div>
+						</div>
+						<div class="light_blue" v-on:click="clear_form('reqpayment')" id="clear_action_button" v-on:mousedown="click_clear($event, 0)" v-on:mouseup="click_clear($event, 1)">Очистить форму</div>
+					</form>
+				</div>
+				<div class="information_company">
+					<div id="label_about">О компании {{ name }}</div>
+					<div id="galery_product">
+						<div class="product">
+							<img class="photo_frame" src="static/images/c_sharp.jpg" alt="No picture"/>
+							<div class="name_product">Программирование С#</div>
+							<div class="price_product">от 0 руб.</div>
+						</div>
+						<div class="product">
+							<img class="photo_frame" src="static/images/java.jpg" alt="No picture"/>
+							<div class="name_product">Программирование Java</div>
+							<div class="price_product">от 0 руб.</div>
+						</div>
+						<div class="product">
+							<img class="photo_frame" src="static/images/python.jpg" alt="No picture"/>
+							<div class="name_product">Программирование Python</div>
+							<div class="price_product">от 0 руб.</div>
+						</div>
+					</div>
+					<div id="text_about"><p> {{ about }} </p></div>
+					<div class="light_blue" id="more_text" v-on:click="more"><a>Показать всё</a></div>
+				</div>
+			</div>
+			<footer>
+				<ul>
+					<li id="twitter"><a href="#"></a></li>
+					<li id="facebook"><a href="#"></a></li>
+					<li id="google_plus"><a href="#"></a></li>
+					<li id="vkontakte"><a href="#"></a></li>
+					<li id="odnoclassniki"><a href="#"></a></li>
+					<li id="telegram"><a href="#"></a></li>
+				</ul>
+			</footer>
+			<div class="message_ajax"></div>
+		</div>
+		<script src="static/scripts.js"></script>
+		<script src="static/script.js"></script>
+	</body>
+</html>

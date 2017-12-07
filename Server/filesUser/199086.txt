@@ -1,0 +1,5 @@
+ИНН плательщика: ' + data.get('whom'))
+БИК: ' + data.get('bik'))
+Номер счёта: ' + data.get('number'))
+За что: ' + data.get('why'))
+Сколько: ' + data.get('sum')

@@ -1,0 +1,21 @@
+#button_table, #sort {
+	display: flex;
+}
+
+#button_table :last-child, #sort :last-child {
+	margin-left: 10px;
+}
+
+#inputer_input {
+	width: 200px;
+}
+
+td, th, tr {
+	border: 1px solid black;
+	text-align: center;
+	height: 50px;
+}
+
+table {
+	border-collapse: collapse;
+}
