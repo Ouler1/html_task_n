@@ -38,18 +38,6 @@ TABLESVAR = {
 }
 SORTVAR = ('asc', 'desc')
 DB = postgresql.open('pq://postgres:palantir@localhost:10000/payment_db')
-# class Application(tornado.web.Application):
-#     def __init__(self):
-#         handlers = [
-#             (r"/", MainHandler),
-#         ]
-#         settings = dict(
-#             template_path=os.path.join(os.path.dirname(__file__), "templates"),
-#             static_path=os.path.join(os.path.dirname(__file__), ""),
-#             xsrf_cookies=True,
-#             cookie_secret="11oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
-#         )
-#         tornado.web.Application.__init__(self, handlers, **settings)
 
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
@@ -336,11 +324,6 @@ class CreatePaymentHandler(tornado.web.RequestHandler):
             temp_form = self.docFormat(temp_form, bytes('{\x004\x00}\x00', encoding='utf-8'), data.get('bik'))
             temp_form = self.docFormat(temp_form, bytes('{\x005\x00}\x00', encoding='utf-8'), data.get('whom'))
             temp_form = self.docFormat(temp_form, bytes('{\x006\x00}\x00', encoding='utf-8'), data.get('number'))
-            # temp_form = temp_form.replace(b'\x00{\x002\x00}', self.docFormat((data.get('sum') + '-00')))
-            # temp_form = temp_form.replace(b'\x00{\x003\x00}', self.docFormat(data.get('why')))
-            # temp_form = temp_form.replace(b'\x00{\x004\x00}', self.docFormat(data.get('bik')))
-            # temp_form = temp_form.replace(b'\x00{\x005\x00}', self.docFormat(data.get('whom')))
-            # temp_form = temp_form.replace(b'\x00{\x006\x00}', self.docFormat(data.get('number')))
             f.write(temp_form)
         yield self.write(HOST + filename)
 
@@ -362,7 +345,7 @@ class FaviconHandler(tornado.web.RequestHandler):
 
 class AdminHandler(BaseHandler):
     def check_xsrf_cookie(self):
-        if self.request.method != 'POST':
+        if self.request.method == 'GET':
             tornado.web.RequestHandler.check_xsrf_cookie(self)
 
     def get(self):
@@ -372,7 +355,7 @@ class AdminHandler(BaseHandler):
             return
         with open('admin.html', encoding='utf-8') as f:
             text = f.read()
-        print(self.current_user)
+        self.set_cookie('_xsrf', self.xsrf_token)
         self.write(text)
 
     def post(self):
@@ -383,14 +366,16 @@ class AdminHandler(BaseHandler):
             self.redirect("/login")
 
 class LoginHandler(BaseHandler):
-    def check_xsrf_cookie(self):
-        pass
-
     def get(self):
-        self.write('<html><body><form action="/login" method="post">'
-                   'Password: <input type="text" name="password">'
-                   '<input type="submit" value="Sign in">'
-                   '</form></body></html>')
+        if self.current_user:
+            print(self.current_user)
+            self.redirect("/admin")
+            return
+        self.write('<html><body><form action="/login" method="post">'\
+                    + self.xsrf_form_html() +\
+                   '''Password: <input type="text" name="password">
+                   <input type="submit" value="Sign in">
+                   </form></body></html>''')
 
     def post(self):
         password = self.get_argument("password")
@@ -420,6 +405,10 @@ class LoadHandler(tornado.web.RequestHandler):
         os.remove(filename)
 
 def make_app():
+    settings = {
+        "cookie_secret": "hewur38274h28vb27348vb2jd382g2vb38247gv3",
+        "xsrf_cookies": True,
+    }
     application = tornado.web.Application([
         (r"/", MainHandler),
         (r"/admin", AdminHandler),
@@ -430,8 +419,7 @@ def make_app():
         (r"/create-payment", CreatePaymentHandler),
         (r"/filesUser/(\d*?-\d*).doc", LoadHandler),
         (r"/login", LoginHandler)
-    ], cookie_secret="hewur38274h28vb27348vb2jd382g2vb38247gv3",
-        xsrf_cookies=True)
+    ], **settings)
     http_server = tornado.httpserver.HTTPServer(application)
     return http_server
 

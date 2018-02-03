@@ -1,6 +1,5 @@
 Vue.component('cell', {
-  template: '#conn-cell',
-  name: 'row-value',
+  template: '<td>{{ value }}</td>',
   props: ['value']
 });
 
@@ -11,20 +10,12 @@ Assoc = {
 	"false": "white"
 };
 
-var getXsrfToken = function() {
-    var cookies = document.cookie.split(';');
-	var token = '';
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].split('=');
-		console.log(cookie);
-        if(cookie[0] == ' ') {
-            token = cookie[1];
-        }
-    }
-    return token;
+function getCookie(name) {
+    var r = document.cookie.match(name + "=([^;]*)\\b");
+    return r ? r[1] : undefined;
 }
 
-Vue.http.headers.common['X-XSRFToken'] = getXsrfToken();
+Vue.http.headers.common['X-XSRFToken'] = getCookie('_xsrf');
 
 var vm = new Vue ({
 	el: "#app",
@@ -49,6 +40,7 @@ var vm = new Vue ({
 			)	
 		},
 		req_table: function (event) {
+			var _xsrf = getCookie("_xsrf");
 			this.$http.get(Assoc[event.target.id]).then(
 			function (response) {
 				var a = document.getElementById('info_table');
@@ -108,6 +100,7 @@ var vm = new Vue ({
 			if(safe=="false") safe="true";
 			else safe="false";
 			json_string = '{"id_record":"' + id + '","is_safe":"' + safe + '"}';
+			var _xsrf = getCookie("_xsrf");
 			this.$http.patch(Assoc['pay'], {body: json_string, responseType: 'json'}).then(
 				function (responce) {
 					this.records[Number(r)]['is_safe'] = safe;
@@ -117,6 +110,8 @@ var vm = new Vue ({
 			);
 		},
 		request: function(event) {
+			var _xsrf = getCookie("_xsrf");
+			
 			this.$http.get(Assoc[this.table.value] + '{?field_s}{&sort}{&field_f}{&filter}', {params: {'field_s': this.alias_1.value, 'sort': this.sort_value.value,
 															  'field_f': this.alias_2.value, 'filter': this.regexp}}
 															  ).then(
@@ -144,6 +139,8 @@ var vm = new Vue ({
 		}
 	},
 	created: function () {
+		var _xsrf = getCookie("_xsrf");
+		
 		this.$http.get(Assoc["pay"]).then(
 			function (response) {
 				var r = 0;
